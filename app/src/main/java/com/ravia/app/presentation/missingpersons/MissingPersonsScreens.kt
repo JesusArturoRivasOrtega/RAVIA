@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,6 +31,7 @@ import com.ravia.app.navigation.Screen
 import com.ravia.app.presentation.components.*
 import com.ravia.app.ui.theme.StatusRed
 import com.ravia.app.ui.theme.StatusRedBg
+import com.ravia.app.ui.theme.StatusRedDark
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -180,17 +182,21 @@ fun MissingPersonDetailScreen(
                 val person = state.data
                 LazyColumn(
                     modifier = Modifier.fillMaxSize().padding(padding),
-                    contentPadding = PaddingValues(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 32.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    contentPadding = PaddingValues(start = 16.dp, top = 14.dp, end = 16.dp, bottom = 32.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp)
                 ) {
                     item {
-                        // Header card
-                        Card(colors = CardDefaults.cardColors(containerColor = StatusRedBg)) {
-                            Column(modifier = Modifier.padding(16.dp)) {
-                                Row(verticalAlignment = Alignment.CenterVertically) {
+                        ElevatedCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.large,
+                            colors = CardDefaults.elevatedCardColors(containerColor = StatusRedBg),
+                            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                                     Box(
                                         modifier = Modifier
-                                            .size(72.dp)
+                                            .size(82.dp)
                                             .background(StatusRed.copy(alpha = 0.2f), CircleShape),
                                         contentAlignment = Alignment.Center
                                     ) {
@@ -201,18 +207,31 @@ fun MissingPersonDetailScreen(
                                                 modifier = Modifier.fillMaxSize().clip(CircleShape)
                                             )
                                         } else {
-                                            Icon(Icons.Default.Person, null, tint = StatusRed, modifier = Modifier.size(44.dp))
+                                            Icon(Icons.Default.Person, null, tint = StatusRed, modifier = Modifier.size(48.dp))
                                         }
                                     }
-                                    Spacer(Modifier.width(16.dp))
-                                    Column {
-                                        Text(person.name, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, color = StatusRed)
-                                        if (person.age != null) Text("${person.age} años", style = MaterialTheme.typography.bodyMedium)
+                                    Column(Modifier.weight(1f)) {
+                                        Text(
+                                            person.name,
+                                            style = MaterialTheme.typography.headlineSmall,
+                                            fontWeight = FontWeight.ExtraBold,
+                                            color = StatusRedDark,
+                                            maxLines = 2,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                        if (person.age != null) Text("${person.age} años", style = MaterialTheme.typography.bodyLarge)
                                         Badge(containerColor = StatusRed, contentColor = androidx.compose.ui.graphics.Color.White) {
                                             Text(person.status.displayName())
                                         }
                                     }
                                 }
+                                Text(
+                                    "Vista por ultima vez: ${person.lastSeenLocation}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onErrorContainer,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
                         }
                     }
@@ -232,8 +251,13 @@ fun MissingPersonDetailScreen(
                     }
 
                     item {
-                        Card {
-                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        ElevatedCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = MaterialTheme.shapes.large,
+                            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
+                        ) {
+                            Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                                 InfoItem("Última ubicación conocida", person.lastSeenLocation, Icons.Outlined.LocationOn)
                                 if (!person.clothing.isNullOrBlank()) InfoItem("Ropa", person.clothing, Icons.Outlined.Checkroom)
                                 if (!person.distinctiveSigns.isNullOrBlank()) InfoItem("Señas particulares", person.distinctiveSigns, Icons.Outlined.Info)
@@ -243,13 +267,26 @@ fun MissingPersonDetailScreen(
                     }
 
                     item {
-                        Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer)) {
-                            Row(modifier = Modifier.padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Icon(Icons.Default.Phone, null, tint = MaterialTheme.colorScheme.primary)
-                                Spacer(Modifier.width(10.dp))
-                                Column {
+                        ElevatedCard(
+                            modifier = Modifier.widthIn(max = 360.dp),
+                            shape = MaterialTheme.shapes.large,
+                            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+                            elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
+                        ) {
+                            Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Surface(
+                                    modifier = Modifier.size(42.dp),
+                                    shape = CircleShape,
+                                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.16f)
+                                ) {
+                                    Box(contentAlignment = Alignment.Center) {
+                                        Icon(Icons.Default.Phone, null, tint = MaterialTheme.colorScheme.primary)
+                                    }
+                                }
+                                Spacer(Modifier.width(12.dp))
+                                Column(Modifier.weight(1f)) {
                                     Text("Contacto autorizado", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    Text(person.contactInfo, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                                    Text(person.contactInfo, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                                 }
                             }
                         }
@@ -276,7 +313,7 @@ fun MissingPersonDetailScreen(
                     item {
                         Button(
                             onClick = { navController.navigate(Screen.ReportSighting.createRoute(person.id)) },
-                            modifier = Modifier.fillMaxWidth().height(52.dp),
+                            modifier = Modifier.fillMaxWidth().height(56.dp),
                             shape = MaterialTheme.shapes.medium,
                             colors = ButtonDefaults.buttonColors(containerColor = StatusRed)
                         ) {

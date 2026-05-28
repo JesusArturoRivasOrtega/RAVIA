@@ -698,23 +698,50 @@ private fun UserRow(
     onUpdateRole: (String, UserRole) -> Unit,
     onUpdateStatus: (String, UserStatus) -> Unit
 ) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.fillMaxWidth().padding(14.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.elevatedCardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(Modifier.fillMaxWidth().padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Surface(
+                    modifier = Modifier.size(44.dp),
+                    shape = MaterialTheme.shapes.medium,
+                    color = MaterialTheme.colorScheme.primaryContainer
+                ) {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(Icons.Outlined.Person, null, tint = MaterialTheme.colorScheme.primary)
+                    }
+                }
                 Column(Modifier.weight(1f)) {
-                    Text(user.name, style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.SemiBold)
-                    Text(user.email, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text(
+                        user.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        user.email,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
                     Text(
                         "${user.reputation} pts, ${user.reportsCount} reportes",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                Column(horizontalAlignment = Alignment.End) {
-                    AssistChip(onClick = {}, label = { Text(user.role.name.lowercase()) })
-                    AssistChip(onClick = {}, label = { Text(user.status.name.lowercase()) })
+                Column(horizontalAlignment = Alignment.End, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    UserMetaChip(user.role.name.lowercase())
+                    UserMetaChip(user.status.name.lowercase(), isActive = user.status == UserStatus.ACTIVE)
                 }
             }
+            Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.45f))
             Row(
                 modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -722,7 +749,10 @@ private fun UserRow(
                 listOf(UserRole.CITIZEN, UserRole.MODERATOR, UserRole.ADMIN)
                     .filter { it != user.role }
                     .forEach { role ->
-                        OutlinedButton(onClick = { onUpdateRole(user.id, role) }) {
+                        OutlinedButton(
+                            onClick = { onUpdateRole(user.id, role) },
+                            modifier = Modifier.heightIn(min = 40.dp)
+                        ) {
                             Text(role.name.lowercase())
                         }
                     }
@@ -732,22 +762,48 @@ private fun UserRow(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 if (user.status != UserStatus.ACTIVE) {
-                    Button(onClick = { onUpdateStatus(user.id, UserStatus.ACTIVE) }) {
+                    Button(
+                        onClick = { onUpdateStatus(user.id, UserStatus.ACTIVE) },
+                        modifier = Modifier.heightIn(min = 42.dp)
+                    ) {
                         Text("Activar")
                     }
                 }
                 if (user.status != UserStatus.SUSPENDED) {
-                    OutlinedButton(onClick = { onUpdateStatus(user.id, UserStatus.SUSPENDED) }) {
+                    OutlinedButton(
+                        onClick = { onUpdateStatus(user.id, UserStatus.SUSPENDED) },
+                        modifier = Modifier.heightIn(min = 42.dp)
+                    ) {
                         Text("Suspender")
                     }
                 }
                 if (user.status != UserStatus.BANNED) {
-                    OutlinedButton(onClick = { onUpdateStatus(user.id, UserStatus.BANNED) }) {
+                    OutlinedButton(
+                        onClick = { onUpdateStatus(user.id, UserStatus.BANNED) },
+                        modifier = Modifier.heightIn(min = 42.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                    ) {
                         Text("Banear")
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun UserMetaChip(label: String, isActive: Boolean = false) {
+    Surface(
+        shape = MaterialTheme.shapes.medium,
+        color = if (isActive) MaterialTheme.colorScheme.tertiaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = if (isActive) MaterialTheme.colorScheme.onTertiaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+    ) {
+        Text(
+            label,
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+            style = MaterialTheme.typography.labelMedium,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
 

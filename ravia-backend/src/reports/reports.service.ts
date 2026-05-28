@@ -13,6 +13,7 @@ import { UsersService } from '../users/users.service';
 import { UserRole, UserStatus } from '../users/user.entity';
 import { User } from '../users/user.entity';
 import { getWithIndexFallback } from '../common/firestore-query.util';
+import { AlertSeverity } from '../alerts/alert.entity';
 
 const CRITICAL_CATEGORIES = new Set<ReportCategory>([
   ReportCategory.FIRE,
@@ -57,6 +58,10 @@ export class ReportsService {
 
   private get col() {
     return this.firebase.collection(COLLECTION);
+  }
+
+  private get alertsCol() {
+    return this.firebase.collection('alerts');
   }
 
   private buildSourceProfile(author: User): ReportSourceProfile {
@@ -140,6 +145,31 @@ export class ReportsService {
 
   private sortNewestFirst(reports: Report[]): Report[] {
     return reports.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  private async publishCriticalReportAlert(reportId: string, report: Pick<Report, 'title' | 'description' | 'category' | 'location' | 'authorId'>): Promise<void> {
+    const now = admin.firestore.FieldValue.serverTimestamp();
+    const alertId = `report_${reportId}_critical`;
+    await this.alertsCol.doc(alertId).set(
+      {
+        title: report.title || 'Reporte critico cercano',
+        description: report.description || `Nuevo reporte critico de ${report.category} cerca de ti`,
+        severity: AlertSeverity.CRITICAL,
+        affectedZones: ['critical_alerts'],
+        isActive: true,
+        authorId: report.authorId,
+        reportId,
+        sourceType: 'report',
+        location: report.location,
+        createdAt: now,
+        updatedAt: now,
+      },
+      { merge: true },
+    );
+
+    await this.notifications.notifyNearbyReport('critical_alerts', reportId, report.category).catch((error) => {
+      this.logger.warn(`Could not notify critical report ${reportId}: ${error?.message ?? error}`);
+    });
   }
 
   private applyQueryFilters(reports: Report[], query: QueryReportsDto, activeOnly: boolean): Report[] {
@@ -229,9 +259,15 @@ export class ReportsService {
     await this.usersService.incrementReportCount(author.id);
     await this.usersService.addReputationPoints(author.id, 10);
 
-    // Critical incidents broadcast immediately
+    // Critical incidents become visible alerts and broadcast immediately.
     if (initialStatus === ReportStatus.CRITICAL) {
-      await this.notifications.notifyNearbyReport('critical_alerts', id, dto.category).catch(() => undefined);
+      await this.publishCriticalReportAlert(id, {
+        title: dto.title,
+        description: dto.description,
+        category: dto.category,
+        location: { lat: dto.lat, lng: dto.lng },
+        authorId: author.id,
+      });
     }
 
     this.logger.log(`Report created: ${id} by ${author.id} status=${initialStatus} priority=${finalPriority}`);
@@ -394,9 +430,9 @@ export class ReportsService {
       await this.notifications.notifyReportStatusChange(report.authorId, id, dto.status);
     }
 
-    // Broadcast critical to nearby
+    // Critical escalations become visible alerts and broadcast immediately.
     if (dto.status === ReportStatus.CRITICAL) {
-      await this.notifications.notifyNearbyReport('critical_alerts', id, report.category).catch(() => undefined);
+      await this.publishCriticalReportAlert(id, report);
     }
 
     return this.findById(id);

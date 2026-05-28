@@ -14,7 +14,7 @@ export class NotificationsService {
     const message: admin.messaging.MulticastMessage = {
       tokens,
       notification: { title, body },
-      data: data ?? {},
+      data: { title, message: body, ...(data ?? {}) },
       android: {
         priority: 'high',
         notification: { channelId: 'ravia_alerts', sound: 'default' },
@@ -33,10 +33,10 @@ export class NotificationsService {
     const message: admin.messaging.Message = {
       topic,
       notification: { title, body },
-      data: data ?? {},
+      data: { title, message: body, ...(data ?? {}) },
       android: {
         priority: 'high',
-        notification: { channelId: 'ravia_alerts' },
+        notification: { channelId: 'ravia_alerts', sound: 'default' },
       },
     };
 
@@ -67,7 +67,7 @@ export class NotificationsService {
     };
 
     const label = statusLabels[newStatus] ?? newStatus;
-    await this.sendToTokens(tokens, 'RAVIA — Actualización de reporte', `Tu reporte fue ${label}`, {
+    await this.sendToTokens(tokens, 'RAVIA - Actualizacion de reporte', `Tu reporte fue ${label}`, {
       type: 'report_status',
       reportId,
       status: newStatus,
@@ -75,14 +75,14 @@ export class NotificationsService {
   }
 
   async broadcastCriticalAlert(title: string, description: string, alertId: string): Promise<void> {
-    await this.sendToTopic('critical_alerts', `🚨 ${title}`, description, {
+    await this.sendToTopic('critical_alerts', `ALERTA CRITICA: ${title}`, description, {
       type: 'critical_alert',
       alertId,
     });
   }
 
   async notifyNearbyReport(topic: string, reportId: string, category: string): Promise<void> {
-    await this.sendToTopic(topic, 'RAVIA — Reporte en tu zona', `Nuevo reporte de ${category} cerca de ti`, {
+    await this.sendToTopic(topic, 'RAVIA - Reporte critico en tu zona', `Nuevo reporte de ${category} cerca de ti`, {
       type: 'nearby_report',
       reportId,
       category,

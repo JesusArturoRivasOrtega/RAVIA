@@ -105,6 +105,7 @@ class AuthRepositoryImpl @Inject constructor(
             val user = usersApi.getMe()
                 .requireBody("No se pudo recuperar la sesion")
                 .toDomain()
+            registerFcmToken()
             saveUserToPrefs(user)
             currentUserFlow.value = user
             true
@@ -141,6 +142,8 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     private suspend fun registerFcmToken() {
+        runCatching { firebaseMessaging?.subscribeToTopic(Constants.TOPIC_CRITICAL)?.await() }
+        runCatching { firebaseMessaging?.subscribeToTopic(Constants.TOPIC_ALL_ALERTS)?.await() }
         val token = runCatching { firebaseMessaging?.token?.await() }.getOrNull() ?: return
         runCatching {
             usersApi.updateMe(UpdateUserRequestDto(fcmToken = token))
