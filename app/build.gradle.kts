@@ -28,7 +28,7 @@ val debugApiBaseUrl = (
     providers.gradleProperty("ravia.debugBaseUrl").orNull
         ?: localProperties.getProperty("ravia.debugBaseUrl")
         ?: System.getenv("RAVIA_DEBUG_BASE_URL")
-        ?: "http://192.168.200.100:3000/api/v1/"
+        ?: "https://ravia-backend.onrender.com/api/v1/"
     ).withTrailingSlash()
 
 android {
@@ -59,7 +59,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            buildConfigField("String", "BASE_URL", "\"https://api.ravia.app/api/v1/\"")
+            buildConfigField("String", "BASE_URL", "\"https://ravia-backend.onrender.com/api/v1/\"")
         }
     }
 

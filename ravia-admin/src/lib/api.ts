@@ -1,6 +1,6 @@
 import axios, { AxiosInstance } from 'axios';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://192.168.200.100:3000/api/v1';
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? 'https://ravia-backend.onrender.com/api/v1';
 
 export const api: AxiosInstance = axios.create({
   baseURL: BASE_URL,
