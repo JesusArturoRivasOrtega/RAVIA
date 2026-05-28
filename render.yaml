@@ -5,8 +5,8 @@ services:
     plan: free
     region: oregon
     rootDir: ravia-backend
-    dockerfilePath: ravia-backend/Dockerfile
-    dockerContext: ravia-backend
+    dockerfilePath: Dockerfile
+    dockerContext: .
     healthCheckPath: /api/v1/health
     autoDeployTrigger: commit
     envVars:
