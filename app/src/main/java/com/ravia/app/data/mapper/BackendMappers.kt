@@ -76,6 +76,14 @@ private fun appMissingStatus(value: String?): MissingPersonStatus = when (value?
     else -> MissingPersonStatus.CLOSED
 }
 
+private fun appUserStatus(value: String?): UserStatus = when (value?.lowercase()) {
+    "active" -> UserStatus.ACTIVE
+    "suspended" -> UserStatus.SUSPENDED
+    "banned" -> UserStatus.BANNED
+    "blocked" -> UserStatus.BLOCKED
+    else -> UserStatus.ACTIVE
+}
+
 fun UserDto.toDomain(): User = User(
     id = id,
     firebaseUid = id,
@@ -85,7 +93,7 @@ fun UserDto.toDomain(): User = User(
     zone = zone,
     avatarUrl = photoUrl,
     reputation = reputationPoints ?: 0,
-    status = runCatching { UserStatus.valueOf(status.orEmpty().uppercase()) }.getOrDefault(UserStatus.ACTIVE),
+    status = appUserStatus(status),
     reportsCount = reportCount ?: 0,
     confirmedReportsCount = confirmedReports ?: 0,
     createdAt = parseApiDate(createdAt)

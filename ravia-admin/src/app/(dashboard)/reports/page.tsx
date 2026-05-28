@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ChevronRight, Filter } from 'lucide-react';
+import { ChevronRight, Filter, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { RaviaGlyph } from '@/components/brand/RaviaGlyph';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -27,6 +27,15 @@ export default function ReportsPage() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['reports'] });
       toast.success('Estado actualizado');
+    },
+    onError: (err: Error) => toast.error(err.message),
+  });
+
+  const deleteReport = useMutation({
+    mutationFn: (id: string) => reportsApi.delete(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['reports'] });
+      toast.success('Reporte eliminado');
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -115,9 +124,18 @@ export default function ReportsPage() {
                       </select>
                     </td>
                     <td className="px-4 py-3">
-                      <Link href={`/reports/${report.id}`} className="grid h-8 w-8 place-items-center rounded-md text-navy-700 transition-colors hover:bg-navy-50">
-                        <ChevronRight className="h-4 w-4" />
-                      </Link>
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => { if (confirm('Eliminar este reporte?')) deleteReport.mutate(report.id); }}
+                          className="grid h-8 w-8 place-items-center rounded-md text-red-600 transition-colors hover:bg-red-50"
+                          disabled={deleteReport.isPending}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                        <Link href={`/reports/${report.id}`} className="grid h-8 w-8 place-items-center rounded-md text-navy-700 transition-colors hover:bg-navy-50">
+                          <ChevronRight className="h-4 w-4" />
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                   );

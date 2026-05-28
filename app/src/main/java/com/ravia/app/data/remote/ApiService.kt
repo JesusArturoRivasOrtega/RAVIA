@@ -42,7 +42,8 @@ interface ReportsApi {
     @GET("reports")
     suspend fun getReports(
         @Query("status") status: String? = null,
-        @Query("limit") limit: Int = 50
+        @Query("limit") limit: Int = 50,
+        @Query("activeOnly") activeOnly: Boolean? = null
     ): Response<List<ReportDto>>
 
     @GET("reports")
@@ -78,6 +79,9 @@ interface ReportsApi {
         @Body body: UpdateReportRequestDto
     ): Response<ReportDto>
 
+    @DELETE("reports/{id}")
+    suspend fun deleteReport(@Path("id") id: String): Response<Unit>
+
     @POST("reports/{id}/analyze")
     suspend fun analyzeReportById(@Path("id") id: String): Response<ReportDto>
 }
@@ -108,6 +112,12 @@ interface MissingPersonsApi {
     @GET("missing-persons/review")
     suspend fun getReviewQueue(): Response<List<MissingPersonDto>>
 
+    @GET("missing-persons/all")
+    suspend fun getAllMissingPersons(
+        @Query("status") status: String? = null,
+        @Query("limit") limit: Int = 100
+    ): Response<List<MissingPersonDto>>
+
     @GET("missing-persons/{id}")
     suspend fun getMissingPersonById(@Path("id") id: String): Response<MissingPersonDto>
 
@@ -125,6 +135,9 @@ interface MissingPersonsApi {
         @Path("id") id: String,
         @Body body: UpdateMissingPersonStatusRequestDto
     ): Response<MissingPersonDto>
+
+    @DELETE("missing-persons/{id}")
+    suspend fun deleteMissingPerson(@Path("id") id: String): Response<Unit>
 }
 
 interface ChatbotApi {

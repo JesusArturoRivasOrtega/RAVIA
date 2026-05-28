@@ -5,7 +5,7 @@ import { FirebaseService } from '../firebase/firebase.service';
 import { MissingPerson, MissingPersonStatus, Sighting } from './missing-person.entity';
 import { User } from '../users/user.entity';
 import { getWithIndexFallback } from '../common/firestore-query.util';
-import { CreateMissingPersonDto, ReportSightingDto } from './dto/missing-person.dto';
+import { CreateMissingPersonDto, ReportSightingDto, UpdateMissingPersonDto } from './dto/missing-person.dto';
 
 const COLLECTION = 'missing_persons';
 
@@ -79,6 +79,27 @@ export class MissingPersonsService {
       .slice(0, limit);
   }
 
+  async findAllForAdmin(status?: MissingPersonStatus, limit = 100): Promise<MissingPerson[]> {
+    let query: admin.firestore.Query = this.col.orderBy('createdAt', 'desc').limit(limit);
+    if (status) query = this.col.where('status', '==', status).orderBy('createdAt', 'desc').limit(limit);
+
+    const { snapshot, usedFallback } = await getWithIndexFallback(
+      query,
+      this.col,
+      this.logger,
+      'missingPersons.findAllForAdmin',
+    );
+
+    let people = snapshot.docs.map((d) => this.docToPerson(d.id, d.data()));
+    if (usedFallback && status) {
+      people = people.filter((person) => person.status === status);
+    }
+
+    return people
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, limit);
+  }
+
   async findById(id: string): Promise<MissingPerson> {
     const doc = await this.col.doc(id).get();
     if (!doc.exists) throw new NotFoundException(`Missing person report ${id} not found`);
@@ -132,5 +153,32 @@ export class MissingPersonsService {
   async updateStatus(id: string, status: MissingPersonStatus): Promise<MissingPerson> {
     await this.col.doc(id).update({ status, updatedAt: admin.firestore.FieldValue.serverTimestamp() });
     return this.findById(id);
+  }
+
+  async update(id: string, dto: UpdateMissingPersonDto): Promise<MissingPerson> {
+    await this.findById(id);
+
+    const updates: Record<string, any> = {
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+
+    if (dto.name !== undefined) updates.name = dto.name;
+    if (dto.age !== undefined) updates.age = dto.age ?? null;
+    if (dto.photoUrl !== undefined) updates.photoUrl = dto.photoUrl || null;
+    if (dto.lastSeenLocation !== undefined) updates.lastSeenLocation = dto.lastSeenLocation;
+    if (dto.lastSeenLat !== undefined) updates.lastSeenLat = dto.lastSeenLat ?? null;
+    if (dto.lastSeenLng !== undefined) updates.lastSeenLng = dto.lastSeenLng ?? null;
+    if (dto.clothing !== undefined) updates.clothing = dto.clothing || null;
+    if (dto.distinctiveSigns !== undefined) updates.distinctiveSigns = dto.distinctiveSigns || null;
+    if (dto.description !== undefined) updates.description = dto.description;
+    if (dto.contactInfo !== undefined) updates.contactInfo = dto.contactInfo;
+
+    await this.col.doc(id).update(updates);
+    return this.findById(id);
+  }
+
+  async delete(id: string): Promise<void> {
+    await this.findById(id);
+    await this.col.doc(id).delete();
   }
 }

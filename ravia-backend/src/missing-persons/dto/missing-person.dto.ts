@@ -113,3 +113,75 @@ export class UpdateMissingPersonStatusDto {
   @IsEnum(MissingPersonStatus)
   status: MissingPersonStatus;
 }
+
+export class UpdateMissingPersonDto {
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(3)
+  @MaxLength(120)
+  name?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  @Max(120)
+  age?: number;
+
+  @ApiPropertyOptional({ description: 'HTTPS URL or data:image/*;base64 photo payload' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(800000)
+  photoUrl?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(3)
+  @MaxLength(240)
+  lastSeenLocation?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(-90)
+  @Max(90)
+  lastSeenLat?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(-180)
+  @Max(180)
+  lastSeenLng?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  clothing?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  distinctiveSigns?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(10)
+  @MaxLength(2000)
+  description?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  @MinLength(5)
+  @MaxLength(240)
+  contactInfo?: string;
+}

@@ -101,10 +101,14 @@ export default function UsersPage() {
                         <option value="moderator">Moderador</option>
                         <option value="admin">Admin</option>
                       </select>
-                      {u.status === 'active' ? (
-                        <button onClick={() => updateStatus.mutate({ id: u.id, status: 'suspended' })} className="text-xs text-red-500 hover:text-red-700">Suspender</button>
-                      ) : (
+                      {u.status !== 'active' && (
                         <button onClick={() => updateStatus.mutate({ id: u.id, status: 'active' })} className="text-xs text-green-600 hover:text-green-800">Activar</button>
+                      )}
+                      {u.status !== 'suspended' && (
+                        <button onClick={() => updateStatus.mutate({ id: u.id, status: 'suspended' })} className="text-xs text-red-500 hover:text-red-700">Suspender</button>
+                      )}
+                      {u.status !== 'banned' && (
+                        <button onClick={() => updateStatus.mutate({ id: u.id, status: 'banned' })} className="text-xs text-red-700 hover:text-red-900">Banear</button>
                       )}
                     </div>
                   </td>

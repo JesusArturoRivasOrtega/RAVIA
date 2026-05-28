@@ -68,9 +68,11 @@ export const riskZonesApi = {
 // ─── Missing Persons ──────────────────────────────────────────────────────────
 export const missingPersonsApi = {
   list: () => api.get('/missing-persons').then((r) => r.data),
+  listAll: (params?: object) => api.get('/missing-persons/all', { params }).then((r) => r.data),
   get: (id: string) => api.get(`/missing-persons/${id}`).then((r) => r.data),
   updateStatus: (id: string, status: string) =>
     api.patch(`/missing-persons/${id}/status`, { status }).then((r) => r.data),
+  delete: (id: string) => api.delete(`/missing-persons/${id}`).then((r) => r.data),
 };
 
 // ─── Statistics ───────────────────────────────────────────────────────────────

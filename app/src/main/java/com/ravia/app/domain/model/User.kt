@@ -3,7 +3,7 @@ package com.ravia.app.domain.model
 import java.util.Date
 
 enum class UserRole { CITIZEN, MODERATOR, ADMIN }
-enum class UserStatus { ACTIVE, SUSPENDED, BLOCKED }
+enum class UserStatus { ACTIVE, SUSPENDED, BANNED, BLOCKED }
 
 data class User(
     val id: String,
