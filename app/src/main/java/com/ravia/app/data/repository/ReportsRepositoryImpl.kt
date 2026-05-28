@@ -188,7 +188,15 @@ private fun Response<*>.requireSuccessful(action: String) {
 private fun Response<*>.errorText(): String {
     val raw = errorBody()?.string()?.takeIf { it.isNotBlank() } ?: message()
     val parsedMessage = runCatching {
-        JSONObject(raw).optString("message").takeIf { it.isNotBlank() }
+        val json = JSONObject(raw)
+        val details = json.optJSONArray("details")
+        if (details != null && details.length() > 0) {
+            val first = details.optJSONObject(0)
+            val errors = first?.optJSONArray("errors")
+            errors?.optString(0)?.takeIf { it.isNotBlank() }
+        } else {
+            json.optString("message").takeIf { it.isNotBlank() }
+        }
     }.getOrNull()
     return (parsedMessage ?: raw).toFriendlyApiMessage()
 }
@@ -199,6 +207,9 @@ private fun String.toFriendlyApiMessage(): String {
         "already confirmed" in normalized -> "Ya habias validado este reporte."
         "unauthorized" in normalized -> "Tu sesion expiro. Inicia sesion de nuevo."
         "forbidden" in normalized -> "No tienes permisos para realizar esta accion."
+        "must be longer than or equal to" in normalized -> "Revisa los campos obligatorios: algunos son demasiado cortos."
+        "must be shorter than or equal to" in normalized -> "Uno de los campos supera el largo permitido."
+        "must be a number" in normalized -> "Revisa los datos numericos ingresados."
         else -> this
     }
 }

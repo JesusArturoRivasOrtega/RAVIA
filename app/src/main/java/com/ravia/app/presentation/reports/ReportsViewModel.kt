@@ -104,7 +104,14 @@ class ReportsViewModel @Inject constructor(
         val category = f.category ?: ReportCategory.OTHER
         val latitude = f.latitude
         val longitude = f.longitude
-        if (f.title.isBlank() || f.description.isBlank()) return
+        if (f.title.trim().length < 5) {
+            _createState.value = UiState.Error("El titulo debe tener al menos 5 caracteres.")
+            return
+        }
+        if (f.description.trim().length < 10) {
+            _createState.value = UiState.Error("La descripcion debe tener al menos 10 caracteres.")
+            return
+        }
         if (latitude == null || longitude == null) {
             _createState.value = UiState.Error("Activa la ubicacion para enviar el reporte.")
             return

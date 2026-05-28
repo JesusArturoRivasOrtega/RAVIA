@@ -345,6 +345,7 @@ private fun InfoItem(label: String, value: String, icon: androidx.compose.ui.gra
 @Composable
 fun CreateMissingPersonScreen(navController: NavController, viewModel: MissingPersonsViewModel = hiltViewModel()) {
     val createState by viewModel.createState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var lastSeen by remember { mutableStateOf("") }
@@ -358,9 +359,16 @@ fun CreateMissingPersonScreen(navController: NavController, viewModel: MissingPe
     ) { uri -> photoUri = uri?.toString() }
 
     LaunchedEffect(createState) {
-        if (createState is UiState.Success) {
-            navController.navigateUp()
-            viewModel.resetCreateState()
+        when (val state = createState) {
+            is UiState.Success -> {
+                val personId = state.data.id
+                viewModel.resetCreateState()
+                navController.navigate(Screen.MissingPersonDetail.createRoute(personId)) {
+                    popUpTo(Screen.CreateMissingPerson.route) { inclusive = true }
+                }
+            }
+            is UiState.Error -> snackbarHostState.showSnackbar(state.message)
+            else -> Unit
         }
     }
 
@@ -371,7 +379,8 @@ fun CreateMissingPersonScreen(navController: NavController, viewModel: MissingPe
                 title = { Text("Reportar desaparecido") },
                 navigationIcon = { IconButton(onClick = { navController.navigateUp() }) { Icon(Icons.Default.ArrowBack, "Volver") } }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { padding ->
         LazyColumn(
             modifier = Modifier

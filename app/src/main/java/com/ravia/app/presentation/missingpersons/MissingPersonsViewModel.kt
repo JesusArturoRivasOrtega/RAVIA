@@ -59,9 +59,42 @@ class MissingPersonsViewModel @Inject constructor(
         clothing: String?, distinctiveSigns: String?,
         description: String, contactInfo: String
     ) {
+        val cleanName = name.trim()
+        val cleanLastSeenLocation = lastSeenLocation.trim()
+        val cleanDescription = description.trim()
+        val cleanContactInfo = contactInfo.trim()
+
+        if (cleanName.length < 3) {
+            _createState.value = UiState.Error("El nombre debe tener al menos 3 caracteres.")
+            return
+        }
+        if (cleanLastSeenLocation.length < 3) {
+            _createState.value = UiState.Error("La ultima ubicacion debe tener al menos 3 caracteres.")
+            return
+        }
+        if (cleanDescription.length < 10) {
+            _createState.value = UiState.Error("La descripcion debe tener al menos 10 caracteres.")
+            return
+        }
+        if (cleanContactInfo.length < 5) {
+            _createState.value = UiState.Error("El contacto debe tener al menos 5 caracteres.")
+            return
+        }
+
         viewModelScope.launch {
             _createState.value = UiState.Loading
-            repo.createMissingPerson(name, age, photoUri, lastSeenLocation, lat, lng, clothing, distinctiveSigns, description, contactInfo).fold(
+            repo.createMissingPerson(
+                cleanName,
+                age,
+                photoUri,
+                cleanLastSeenLocation,
+                lat,
+                lng,
+                clothing?.trim()?.ifBlank { null },
+                distinctiveSigns?.trim()?.ifBlank { null },
+                cleanDescription,
+                cleanContactInfo
+            ).fold(
                 onSuccess = { _createState.value = UiState.Success(it) },
                 onFailure = { _createState.value = UiState.Error(it.message ?: "Error") }
             )

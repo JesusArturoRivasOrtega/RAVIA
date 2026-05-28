@@ -17,6 +17,7 @@ import com.ravia.app.domain.repository.MissingPersonsRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.tasks.await
+import org.json.JSONObject
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -121,6 +122,33 @@ private fun <T> Response<T>.requireBody(action: String): T {
     if (isSuccessful) {
         return body() ?: throw IllegalStateException("$action: respuesta vacia.")
     }
-    val detail = errorBody()?.string()?.takeIf { it.isNotBlank() } ?: message()
-    throw IllegalStateException("$action (${code()}): $detail")
+    throw IllegalStateException("$action (${code()}): ${errorText()}")
+}
+
+private fun Response<*>.errorText(): String {
+    val raw = errorBody()?.string()?.takeIf { it.isNotBlank() } ?: message()
+    val parsedMessage = runCatching {
+        val json = JSONObject(raw)
+        val details = json.optJSONArray("details")
+        if (details != null && details.length() > 0) {
+            val first = details.optJSONObject(0)
+            val errors = first?.optJSONArray("errors")
+            errors?.optString(0)?.takeIf { it.isNotBlank() }
+        } else {
+            json.optString("message").takeIf { it.isNotBlank() }
+        }
+    }.getOrNull()
+    return (parsedMessage ?: raw).toFriendlyApiMessage()
+}
+
+private fun String.toFriendlyApiMessage(): String {
+    val normalized = lowercase()
+    return when {
+        "unauthorized" in normalized -> "Tu sesion expiro. Inicia sesion de nuevo."
+        "forbidden" in normalized -> "No tienes permisos para realizar esta accion."
+        "must be longer than or equal to" in normalized -> "Revisa los campos obligatorios: algunos son demasiado cortos."
+        "must be shorter than or equal to" in normalized -> "Uno de los campos supera el largo permitido."
+        "must be a number" in normalized -> "Revisa los datos numericos ingresados."
+        else -> this
+    }
 }

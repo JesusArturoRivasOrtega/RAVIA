@@ -220,13 +220,13 @@ export class ReportsService {
     const initialHistory: ReportStatusHistory = {
       status: initialStatus,
       changedBy: author.id,
-      reason: initialStatus === ReportStatus.CRITICAL
-        ? 'Categoría crítica detectada al crear'
-        : authorTrusted
-          ? 'Reporte verificado al origen (rol confiable)'
-          : undefined,
       timestamp: historyTimestamp.toDate(),
     };
+    if (initialStatus === ReportStatus.CRITICAL) {
+      initialHistory.reason = 'Categoría crítica detectada al crear';
+    } else if (authorTrusted) {
+      initialHistory.reason = 'Reporte verificado al origen (rol confiable)';
+    }
 
     const data: Record<string, any> = {
       title: dto.title,

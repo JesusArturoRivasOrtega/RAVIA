@@ -9,6 +9,7 @@ export class FirebaseService implements OnModuleInit {
   onModuleInit() {
     if (admin.apps.length > 0) {
       this.app = admin.apps[0];
+      this.configureFirestore();
       return;
     }
 
@@ -32,8 +33,17 @@ export class FirebaseService implements OnModuleInit {
       storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
       projectId: process.env.FIREBASE_PROJECT_ID,
     });
+    this.configureFirestore();
 
     this.logger.log('Firebase Admin SDK initialized');
+  }
+
+  private configureFirestore() {
+    try {
+      this.app.firestore().settings({ ignoreUndefinedProperties: true });
+    } catch {
+      // Firestore settings can only be applied before the first operation.
+    }
   }
 
   get auth(): admin.auth.Auth {
