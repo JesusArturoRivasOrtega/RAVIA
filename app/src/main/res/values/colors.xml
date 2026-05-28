@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ravia_navy_950">#060D1A</color>
+    <color name="ravia_navy_900">#0A1628</color>
+    <color name="ravia_navy">#1B3A6B</color>
+    <color name="ravia_blue">#1E88E5</color>
+    <color name="ravia_cyan">#00B4D8</color>
+    <color name="ravia_surface">#FFFFFF</color>
+    <color name="ravia_background">#F5F7FA</color>
+    <color name="ravia_error">#E53935</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+</resources>

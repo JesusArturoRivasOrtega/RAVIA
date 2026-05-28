@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Ravia" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:fontFamily">sans</item>
+        <item name="android:colorAccent">@color/ravia_blue</item>
+        <item name="android:statusBarColor">@color/ravia_background</item>
+        <item name="android:navigationBarColor">@color/ravia_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowSplashScreenBackground">@color/ravia_navy_900</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ravia_guard_dog_logo</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@color/ravia_navy_900</item>
+    </style>
+</resources>

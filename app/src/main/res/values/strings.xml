@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">RAVIA</string>
+    <string name="app_description">Red de Alerta Vecinal con Inteligencia Artificial</string>
+    <string name="onboarding_skip">Omitir</string>
+    <string name="onboarding_next">Siguiente</string>
+    <string name="onboarding_start">Comenzar</string>
+    <string name="login_title">Iniciar sesión</string>
+    <string name="register_title">Crear cuenta</string>
+    <string name="email_hint">Correo electrónico</string>
+    <string name="password_hint">Contraseña</string>
+    <string name="error_empty_fields">Por favor completa todos los campos requeridos</string>
+    <string name="error_invalid_email">Correo electrónico inválido</string>
+    <string name="error_password_too_short">La contraseña debe tener al menos 6 caracteres</string>
+    <string name="error_passwords_dont_match">Las contraseñas no coinciden</string>
+    <string name="error_network">Error de conexión. Intenta de nuevo.</string>
+    <string name="demo_mode_title">Modo demostración activo</string>
+    <string name="demo_mode_body">La app funciona con datos simulados. No se requiere conexión real.</string>
+    <string name="notification_channel_alerts">Alertas de emergencia</string>
+    <string name="notification_channel_reports">Actualizaciones de reportes</string>
+    <string name="notification_channel_general">General</string>
+    <string name="location_permission_rationale">RAVIA necesita tu ubicación para mostrar reportes cercanos y alertas en tu zona.</string>
+    <string name="camera_permission_rationale">RAVIA necesita acceso a la cámara para adjuntar fotos a tus reportes.</string>
+</resources>

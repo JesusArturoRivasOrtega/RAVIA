@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --navy: #1b3a6b;
+    --navy-light: #3b5ea6;
+    --ink: #0f172a;
+    --muted: #64748b;
+    --panel: #ffffff;
+    --line: #dde1e7;
+    --cyan: #00b4d8;
+    --green: #2dc653;
+  }
+
+  body {
+    @apply bg-[#f5f7fa] text-slate-900 antialiased;
+  }
+
+  * {
+    @apply border-slate-200;
+  }
+
+  ::selection {
+    @apply bg-cyan-100 text-navy-900;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-navy-700 hover:bg-navy-500 text-white px-4 py-2 rounded-lg font-medium shadow-sm transition-all duration-200 hover:-translate-y-0.5 disabled:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:-translate-y-0.5;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-all duration-200 hover:-translate-y-0.5;
+  }
+
+  .card {
+    @apply bg-white rounded-lg border border-slate-200 shadow-sm;
+  }
+
+  .input {
+    @apply w-full border border-slate-300 rounded-lg px-3 py-2 text-sm transition focus:outline-none focus:ring-2 focus:ring-navy-700 focus:border-transparent;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .panel-enter {
+    animation: ravia-enter 420ms cubic-bezier(.2,.8,.2,1) both;
+  }
+
+  .interactive-card {
+    @apply transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md;
+  }
+
+  .ravia-scan {
+    background-image:
+      linear-gradient(rgba(27, 58, 107, 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(27, 58, 107, 0.045) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+}
+
+@keyframes ravia-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

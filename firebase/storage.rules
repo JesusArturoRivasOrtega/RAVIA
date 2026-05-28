@@ -1,0 +1,55 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function validImage() {
+      return request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    function validVideo() {
+      return request.resource.size < 50 * 1024 * 1024
+        && request.resource.contentType.matches('video/.*');
+    }
+
+    function validAudio() {
+      return request.resource.size < 20 * 1024 * 1024
+        && request.resource.contentType.matches('audio/.*');
+    }
+
+    match /reportes/{reportId}/imagenes/{fileName} {
+      allow read: if signedIn();
+      allow write: if signedIn() && validImage();
+    }
+
+    match /reportes/{reportId}/videos/{fileName} {
+      allow read: if signedIn();
+      allow write: if signedIn() && validVideo();
+    }
+
+    match /reportes/{reportId}/audios/{fileName} {
+      allow read: if signedIn();
+      allow write: if signedIn() && validAudio();
+    }
+
+    match /desaparecidos/{personId}/foto/{fileName} {
+      allow read: if signedIn();
+      allow write: if signedIn() && validImage();
+    }
+
+    match /desaparecidos/{personId}/avistamientos/{fileName} {
+      allow read: if signedIn();
+      allow write: if signedIn() && validImage();
+    }
+
+    match /usuarios/{userId}/avatar/{fileName} {
+      allow read: if signedIn();
+      allow write: if signedIn() && request.auth.uid == userId && validImage();
+    }
+  }
+}
+

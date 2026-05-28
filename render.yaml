@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: ravia-backend
+    runtime: docker
+    plan: free
+    region: oregon
+    rootDir: ravia-backend
+    dockerfilePath: ravia-backend/Dockerfile
+    dockerContext: ravia-backend
+    healthCheckPath: /api/v1/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FIREBASE_PROJECT_ID
+        value: ravia-4f174
+      - key: FIREBASE_STORAGE_BUCKET
+        value: ravia-4f174.firebasestorage.app
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: AI_PROVIDER
+        value: internal
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: THROTTLE_TTL
+        value: 60000
+      - key: THROTTLE_LIMIT
+        value: 100
+      - key: CORS_ORIGINS
+        value: http://localhost:3001
